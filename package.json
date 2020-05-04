@@ -19,7 +19,18 @@
 				"command": "zeka-vs-code.helloWorld",
 				"title": "Hello World"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Zeka VS Code",
+			"properties": {
+				"zeka-vs-code.repository": {
+					"type": "string",
+					"default": "",
+					"description": "Path to your Zeka repository.",
+					"scope": "machine-overridable"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
