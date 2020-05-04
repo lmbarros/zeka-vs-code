@@ -1,3 +1,11 @@
+/******************************************************************************\
+* Zeka VS Code                                                                 *
+*                                                                              *
+* © 2020 Leandro Motta Barros                                                  *
+*                                                                              *
+* Licensed under the MIT license. See LICENSE.txt for details.                 *
+\******************************************************************************/
+
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
