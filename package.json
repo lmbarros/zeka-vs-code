@@ -16,14 +16,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:zeka-vs-code.helloWorld"
+		"onCommand:lmb.zeka-vs-code.createNote"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "zeka-vs-code.helloWorld",
-				"title": "Hello World"
+				"command": "lmb.zeka-vs-code.createNote",
+				"title": "Zeka: Create Note"
 			}
 		],
 		"configuration": {
@@ -36,7 +36,13 @@
 					"scope": "machine-overridable"
 				}
 			}
-		}
+		},
+		"keybindings": [
+			{
+				"command": "lmb.zeka-vs-code.createNote",
+				"key": "ctrl+alt+z n"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

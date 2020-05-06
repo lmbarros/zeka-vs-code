@@ -6,30 +6,108 @@
 * Licensed under the MIT license. See LICENSE.txt for details.                 *
 \******************************************************************************/
 
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import * as fs from "fs";
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+
+// This gets called when the extension is activated.
 export function activate(context: vscode.ExtensionContext) {
+	console.log("Activating the zeka-vs-code extension.");
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "zeka-vs-code" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('zeka-vs-code.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Zeka VS Code!');
+	// Create Note
+	let disposable = vscode.commands.registerCommand('lmb.zeka-vs-code.createNote', () => {
+		checkRepoThen(() => {
+			createNote();
+		});
 	});
 
 	context.subscriptions.push(disposable);
 }
 
-// this method is called when your extension is deactivated
+// This method get called when the extension is deactivated.
 export function deactivate() {}
+
+
+// Create note command.
+function createNote() {
+	vscode.window.showInputBox({
+		placeHolder: "Note title"
+	}).then(title => {
+		if (title === undefined) {
+			return;
+		}
+
+		let repo = vscode.workspace.getConfiguration().get<string>("zeka-vs-code.repository");
+		if (repo === undefined) {
+			return;
+		}
+
+		let filteredTitle = canonicalizeString(title);
+		let fileName = repo + "/notes/" + timeTag() + "-" + filteredTitle + ".md";
+
+		fs.writeFileSync(fileName, `# ${title}` + "\n\n");
+
+		var setting: vscode.Uri = vscode.Uri.parse("file:" + fileName);
+		vscode.workspace.openTextDocument(setting).then((doc: vscode.TextDocument) => {
+			vscode.window.showTextDocument(doc);
+		});
+	});
+}
+
+
+
+// Checks if the repo exists where configured and, if so, executes func.
+function checkRepoThen(func: () => void) {
+	let repo = vscode.workspace.getConfiguration().get<string>("zeka-vs-code.repository");
+	if (repo === undefined || repo === "") {
+		vscode.window.showErrorMessage("No repository defined! Please define it in the settings.");
+		return;
+	}
+
+	if (!fs.existsSync(repo)) {
+		vscode.window.showErrorMessage(`Repository not found at '${repo}'.`);
+		return;
+	}
+
+	func();
+}
+
+
+// Returns the date/time "tag" I use in my filenames.Equivalent to
+// `date +0%Y%m%d%H%M%S` in the shell.
+function timeTag(): string {
+	let now = new(Date);
+
+	let Y = `${now.getFullYear()}`;
+	let m = (now.getMonth() + 1 < 10 ? "0" : "") + `${now.getMonth() + 1}`;
+	let d = (now.getDate() < 10 ? "0" : "") + `${now.getDate()}`;
+	let H = (now.getHours() < 10 ? "0" : "") + `${now.getHours()}`;
+	let M = (now.getMinutes() < 10 ? "0" : "") + `${now.getMinutes()}`;
+	let S = (now.getSeconds() < 10 ? "0" : "") + `${now.getSeconds()}`;
+
+	// I want my notes Y10K compliant! (But, yeah, this hardcoded leading zero
+	// is a ticking bomb!)
+	return `0${Y}${m}${d}${H}${M}${S}`;
+}
+
+
+// Filters out stuff like diacritics and spaces from a string so that I feel
+// comfortable using it on a file name.
+//
+// See https://stackoverflow.com/a/37511463 for the clever diacritics removal
+// enchantment I used here.
+//
+// The rest of it are just heuristics that seem to work reasonably well for me.
+function canonicalizeString(title: string): string {
+	return title.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.replace(/[\(\[\{]/g, "-")
+		.replace(/[\)\]\}]/g, "")
+		.replace(/[\.\,\!\?\;]/g, " ")
+		.replace(":", "-")
+		.replace(/ *- */g, "-")
+		.replace(/^ +/g, "")
+		.replace(/ +$/g, "")
+		.replace(/ +/g, " ")
+		.replace(/ +/g, "_");
+}
