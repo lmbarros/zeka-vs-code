@@ -10,6 +10,7 @@
     "typescript.tsc.autoDetect": "off",
     "cSpell.words": [
         "canonicalize",
+        "canonicalized",
         "overridable",
         "zeka"
     ]
