@@ -21,6 +21,13 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	// Create Reference
+	disposable = vscode.commands.registerCommand('lmb.zeka-vs-code.createReference', () => {
+		util.checkRepoThen(() => { commands.createReference(); });
+	});
+
+	context.subscriptions.push(disposable);
 }
 
 // This method get called when the extension is deactivated.

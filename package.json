@@ -16,7 +16,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:lmb.zeka-vs-code.createNote"
+		"onCommand:lmb.zeka-vs-code.createNote",
+		"onCommand:lmb.zeka-vs-code.createReference"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -24,6 +25,10 @@
 			{
 				"command": "lmb.zeka-vs-code.createNote",
 				"title": "Zeka: Create Note"
+			},
+			{
+				"command": "lmb.zeka-vs-code.createReference",
+				"title": "Zeka: Create Reference"
 			}
 		],
 		"configuration": {
@@ -41,6 +46,10 @@
 			{
 				"command": "lmb.zeka-vs-code.createNote",
 				"key": "ctrl+alt+z n"
+			},
+			{
+				"command": "lmb.zeka-vs-code.createReference",
+				"key": "ctrl+alt+z r"
 			}
 		]
 	},

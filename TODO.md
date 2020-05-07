@@ -1,6 +1,5 @@
 # Zeka TODO
 
-* *Add Reference* command.
 * Render links to notes.
 * Render links to references.
 * *Link Note* command (including some decent searching).
@@ -9,3 +8,6 @@
 * *Add Attachment* comment (for images, basically).
 * Render links to attachments.
 * *Link Attachment* command (including some decent searching, maybe browse looking at the images themselves).
+* When adding reference, split a title like "Foo: Bar" into title and subtitle,
+  and pre-fill the template accordingly.
+  
