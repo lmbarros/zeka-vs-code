@@ -18,7 +18,8 @@
 	],
 	"activationEvents": [
 		"onCommand:lmb.zeka-vs-code.createNote",
-		"onCommand:lmb.zeka-vs-code.createReference"
+		"onCommand:lmb.zeka-vs-code.createReference",
+		"onCommand:lmb.zeka-vs-code.createSketch"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -30,6 +31,10 @@
 			{
 				"command": "lmb.zeka-vs-code.createReference",
 				"title": "Zeka: Create Reference"
+			},
+			{
+				"command": "lmb.zeka-vs-code.createSketch",
+				"title": "Zeka: Create Sketch"
 			}
 		],
 		"configuration": {
@@ -51,6 +56,10 @@
 			{
 				"command": "lmb.zeka-vs-code.createReference",
 				"key": "ctrl+alt+z r"
+			},
+			{
+				"command": "lmb.zeka-vs-code.createSketch",
+				"key": "ctrl+alt+z s"
 			}
 		]
 	},

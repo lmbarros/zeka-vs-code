@@ -7,3 +7,5 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 - Create Note
+- Create Reference
+- Create Sketch

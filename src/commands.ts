@@ -91,6 +91,38 @@ export async function createReference() {
 }
 
 
+/**
+ * The Create Sketch command.
+ *
+ * Which (guess what?) creates a sketch (of a note).
+ */
+export async function createSketch() {
+	let title = await vscode.window.showInputBox({
+		placeHolder: "Sketch title"
+	});
+
+	if (title === undefined) {
+		return;
+	}
+
+	let repo = vscode.workspace.getConfiguration().get<string>("zeka-vs-code.repository");
+	if (repo === undefined) {
+		return;
+	}
+
+	let cleanTitle = util.canonicalizeString(title);
+	let fileName = repo + "/sketches/" + util.timestamp() + "-" + cleanTitle + ".md";
+
+	fs.writeFileSync(fileName, `# ${title}` + "\n\n");
+
+	let setting: vscode.Uri = vscode.Uri.parse("file:" + fileName);
+
+	let doc = await vscode.workspace.openTextDocument(setting);
+	vscode.window.showTextDocument(doc);
+}
+
+
+
 // Templates used when creating a new reference.
 const referenceTemplates = new Map([
 	["Book", `type = "book"

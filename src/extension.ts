@@ -28,6 +28,13 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	// Create Sketch
+	disposable = vscode.commands.registerCommand('lmb.zeka-vs-code.createSketch', () => {
+		util.checkRepoThen(() => { commands.createSketch(); });
+	});
+
+	context.subscriptions.push(disposable);
 }
 
 // This method get called when the extension is deactivated.
