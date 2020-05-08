@@ -13,3 +13,7 @@
   looking at the images themselves).
 * When adding reference, split a title like "Foo: Bar" into title and subtitle,
   and pre-fill the template accordingly.
+* Rename file when title is changed.
+* Auto-complete #tags.
+* Auto-complete @projects.
+* Promote sketch to note.
