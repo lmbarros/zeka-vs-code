@@ -3,6 +3,7 @@
 	"name": "zeka-vs-code",
 	"displayName": "Zeka VS Code",
 	"description": "Zettelkasten-inspired, Markdown-based knowledge management system.",
+	"icon": "images/zekaIcon.png",
 	"version": "0.0.1",
 	"repository": {
 		"type": "git",
