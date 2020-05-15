@@ -35,6 +35,13 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	// Follow link under cursor
+	disposable = vscode.commands.registerCommand('lmb.zeka-vs-code.followLinkUnderCursor', () => {
+		util.checkRepoThen(() => { commands.followLinkUnderCursor(); });
+	});
+
+	context.subscriptions.push(disposable);
 }
 
 // This method get called when the extension is deactivated.

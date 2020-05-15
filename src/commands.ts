@@ -12,7 +12,7 @@ import * as fs from "fs";
 
 
 /**
- * The Create Note command.
+ * The "Create Note" command.
  *
  * Used to (...drum roll...) create a note.
  */
@@ -43,7 +43,7 @@ export async function createNote() {
 
 
 /**
- * The Create Reference command.
+ * The "Create Reference" command.
  *
  * Which creates references (to books, papers, movies, etc).
  */
@@ -92,7 +92,7 @@ export async function createReference() {
 
 
 /**
- * The Create Sketch command.
+ * The "Create Sketch" command.
  *
  * Which (guess what?) creates a sketch (of a note).
  */
@@ -121,6 +121,15 @@ export async function createSketch() {
 	vscode.window.showTextDocument(doc);
 }
 
+
+/**
+ * The "Follow link under cursor" command.
+ *
+ * Which opens the note or reference whose link is right under the cursor.
+ */
+export async function followLinkUnderCursor() {
+	util.followLink(util.getLinkUnderCursor());
+}
 
 
 // Templates used when creating a new reference.

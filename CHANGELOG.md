@@ -9,3 +9,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Create Note
 - Create Reference
 - Create Sketch
+- Follow link under cursor

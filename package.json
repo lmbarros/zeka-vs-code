@@ -19,7 +19,8 @@
 	"activationEvents": [
 		"onCommand:lmb.zeka-vs-code.createNote",
 		"onCommand:lmb.zeka-vs-code.createReference",
-		"onCommand:lmb.zeka-vs-code.createSketch"
+		"onCommand:lmb.zeka-vs-code.createSketch",
+		"onCommand:lmb.zeka-vs-code.followLinkUnderCursor"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -35,6 +36,10 @@
 			{
 				"command": "lmb.zeka-vs-code.createSketch",
 				"title": "Zeka: Create Sketch"
+			},
+			{
+				"command": "lmb.zeka-vs-code.followLinkUnderCursor",
+				"title": "Zeka: Follow link under cursor"
 			}
 		],
 		"configuration": {
@@ -60,6 +65,11 @@
 			{
 				"command": "lmb.zeka-vs-code.createSketch",
 				"key": "ctrl+alt+z s"
+			},
+			{
+				"command": "lmb.zeka-vs-code.followLinkUnderCursor",
+				"key": "ctrl+enter",
+				"when": "editorTextFocus && resourceLangId == markdown && resourceFilename =~ /[0-9]{15}-.+\\.md$/"
 			}
 		]
 	},

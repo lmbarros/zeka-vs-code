@@ -1,6 +1,5 @@
 # Zeka TODO
 
-* Navigate to link.
 * Show link information (title, reference info) in the status bar or something
   like that.
 * Render links to notes.

@@ -8,6 +8,40 @@
 
 import * as vscode from "vscode";
 import * as fs from "fs";
+import * as glob from "glob";
+
+
+// A regex matching (and capturing) the timestamp IDs I use for the Zeka
+// "objects".
+const zekaLinkIDRegex = `([0-9]{5}[0-1][0-9][0-3][0-9][0-2][0-9](?:[0-5][0-9]){2})`;
+
+// A regex matching a link to a note, something like "[extra][[0202005140845]]",
+// where the "[extra]" part is optional. Captures the "extra" part and the
+// timestamp ID.
+const zekaNoteLinkRegex = new RegExp(
+	`(?:\\[([^\\[\\]]+)\\])?` +
+	`\\[\\[` + zekaLinkIDRegex + `\\]\\]`);
+
+// A regex matching a link to a reference, something like
+// "{extra}{{0202005140845}}", where the "{extra}" part is optional. Captures
+// the "extra" part and the timestamp ID.
+const zekaReferenceLinkRegex = new RegExp(
+	`(?:\\{([^\\{\\}]+)\\})?` +
+	`\\{\\{` + zekaLinkIDRegex + `\\}\\}`);
+
+// A regex matching a link to an attachment, something like
+// "(extra)((0202005140845))", where the "(extra)" part is optional. Captures
+// the "extra" part and the timestamp ID.
+const zekaAttachmentLinkRegex = new RegExp(
+	`(?:\\(([^\\(\\)]+)\\))?` +
+	`\\(\\(` + zekaLinkIDRegex + `\\)\\)`);
+
+// A regex matching any type of Zeka link. Please don't rely on the captures
+// from this regex.
+const zekaLinkRegex = new RegExp(
+	`(?:` + zekaNoteLinkRegex.source + `)` +
+	`|(?:`+ zekaReferenceLinkRegex.source + `)` +
+	`|(?:`+ zekaAttachmentLinkRegex.source + `)`);
 
 
 /**
@@ -85,4 +119,140 @@ export function checkRepoThen(func: () => void) {
 	}
 
 	func();
+}
+
+/**
+ * The types of links we can have in a Zeka document.
+ */
+export enum LinkType {
+	Note,
+	Reference,
+	Attachment
+}
+
+/**
+ * Encodes information about a link to a Zeka object.
+ *
+ * A link looks like this:
+ *
+ * - Link to Note: [extra][[id]]
+ * - Link to Reference: {extra}{{id}}
+ * - Link to Attachment: (extra)((id))
+ *
+ * The "extra" part (including the brackets) is optional.
+ */
+export class ZekaLink {
+	public constructor(
+		readonly type: LinkType,
+		readonly id: string,
+		readonly extra: string) {}
+}
+
+
+// Returns the text of the Zeka link under the cursor. If no link is under the
+// cursor, returns an empty string.
+function getLinkTextUnderCursor(): string {
+	let editor = vscode.window.activeTextEditor;
+	let doc = editor?.document;
+
+	if (editor === undefined || doc === undefined) {
+		return "";
+	}
+
+	let linkRange = doc.getWordRangeAtPosition(editor.selection.active, zekaLinkRegex);
+	if (linkRange === undefined) {
+		return "";
+	}
+
+	let linkText = doc.getText(linkRange);
+
+	if (linkText === undefined) {
+		return "";
+	}
+
+	return linkText;
+}
+
+
+/**
+ * Returns the link under the cursor, or `undefined` if there is no link under
+ * the cursor.
+ */
+export function getLinkUnderCursor(): (ZekaLink|undefined) {
+	let linkText = getLinkTextUnderCursor();
+	if (linkText === "") {
+		return undefined;
+	}
+
+	let matches = linkText.match(zekaNoteLinkRegex);
+	if (matches !== null) {
+		return new ZekaLink(LinkType.Note, matches[2], matches[1]);
+	}
+
+	matches = linkText.match(zekaReferenceLinkRegex);
+	if (matches !== null) {
+		return new ZekaLink(LinkType.Reference, matches[2], matches[1]);
+	}
+
+	matches = linkText.match(zekaAttachmentLinkRegex);
+	if (matches !== null) {
+		return new ZekaLink(LinkType.Attachment, matches[2], matches[1]);
+	}
+
+	console.log("Something fishy with getLinkUnderCursor(): should have had a match!");
+	return undefined;
+}
+
+export function followLink(link: ZekaLink|undefined) {
+	if (link === undefined) {
+		return;
+	}
+
+	let repo = vscode.workspace.getConfiguration().get<string>("zeka-vs-code.repository");
+	if (repo === undefined || repo === "") {
+		console.error("Something fishy in followLink(): no Zeka repository configured!");
+		return;
+	}
+
+	let files: string[] = [];
+
+	switch(link.type) {
+		case LinkType.Note:
+			openFileByGlob(`${repo}/notes/${link.id}*.md`);
+			break;
+
+		case LinkType.Reference:
+			openFileByGlob(`${repo}/references/${link.id}*.toml`);
+			break;
+
+		case LinkType.Attachment:
+			openFileByGlob(`${repo}/attachments/${link.id}*`);
+			break;
+	}
+}
+
+// Opens a file matching `theGlob`. Expects that one, and only one, match will
+// exist.
+function openFileByGlob(theGlob: string) {
+	glob(theGlob, async function(err, files) {
+		if (err !== null) {
+			console.error(`Error looking for files with glob ${theGlob}.`);
+			return;
+		}
+
+		if (files.length === 0) {
+			vscode.window.showErrorMessage(`No match found for ${theGlob}.`);
+			return;
+		}
+
+		if (files.length > 1) {
+			vscode.window.showErrorMessage(`Ops, got multiple matches for ${theGlob}.`);
+			return;
+		}
+
+		let setting: vscode.Uri = vscode.Uri.parse("file:" + files[0]);
+
+		let doc = await vscode.workspace.openTextDocument(setting);
+		vscode.window.showTextDocument(doc);
+	});
 }
