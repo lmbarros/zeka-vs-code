@@ -141,11 +141,9 @@ author = "" # ["", ""]
 year =
 month =
 edition = # 1 or "Special Edition"
+volume =
 numPages =
 publisher = ""
-
-review = """
-"""
 `],
 
 	["ConferencePaper", `type = "conferencePaper"
@@ -156,9 +154,6 @@ year =
 month =
 numPages =
 conference = ""
-
-review = """
-"""
 `],
 
 	["JournalPaper", `type = "journalPaper"
@@ -171,9 +166,6 @@ numPages =
 journal = ""
 volume =
 number =
-
-review = """
-"""
 `],
 
 	["TechnicalReport", `type = "technicalReport"
@@ -185,9 +177,6 @@ month =
 numPages =
 institution = ""
 code = ""
-
-review = """
-"""
 `],
 
 	["BlogPost", `type = "blogPost"
@@ -197,9 +186,6 @@ author = "" # ["", ""]
 year =
 month =
 url = ""
-
-review = """
-"""
 `],
 
 	["Movie", `type = "movie"
@@ -208,9 +194,6 @@ subtitle = ""
 director = "" # ["", ""]
 actors = "" # ["", ""]
 year =
-
-review = """
-"""
 `],
 
 	["Game", `type = "game"
@@ -221,8 +204,5 @@ studio = ""
 publisher = ""
 platform = "" # ["", ""]
 year =
-
-review= """
-"""
 `]
 ]);
