@@ -123,6 +123,31 @@ export async function createSketch() {
 
 
 /**
+ * The "Create Link" command.
+ *
+ * Which offers some handy help to create links to other Zeka resources.
+ */
+export async function createLink() {
+	// TODO: showQuickPick() accepts a list of items with descriptions and
+	// details, I think. Just what I need for richer selection.
+	let pick = await vscode.window.showQuickPick(
+		util.getListForLinkCreation(),
+		{
+			placeHolder: "The placeholder",
+			matchOnDescription: true,
+			matchOnDetail: true,
+		});
+
+	if (pick === undefined) {
+		return;
+	}
+
+	const snippet = new vscode.SnippetString("[${1:" + pick.label + "}]((" + pick.detail + "))");
+	vscode.window.activeTextEditor?.insertSnippet(snippet);
+}
+
+
+/**
  * The "Follow link under cursor" command.
  *
  * Which opens the note or reference whose link is right under the cursor.

@@ -9,6 +9,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as glob from "glob";
+import { QuickPickItem } from "vscode";
 
 
 // A regex matching (and capturing) the timestamp IDs I use for the Zeka
@@ -214,8 +215,6 @@ export function followLink(link: ZekaLink|undefined) {
 		return;
 	}
 
-	let files: string[] = [];
-
 	switch(link.type) {
 		case LinkType.Note:
 			openFileByGlob(`${repo}/notes/${link.id}*.md`);
@@ -255,4 +254,42 @@ function openFileByGlob(theGlob: string) {
 		let doc = await vscode.workspace.openTextDocument(setting);
 		vscode.window.showTextDocument(doc);
 	});
+}
+
+
+// Opens a file matching `theGlob`. Expects that one, and only one, match will
+// exist.
+export function getListForLinkCreation(): QuickPickItem[] {
+	let repo = vscode.workspace.getConfiguration().get<string>("zeka-vs-code.repository");
+	if (repo === undefined || repo === "") {
+		console.error("Something fishy in getListForLinkCreation: no Zeka repository configured!");
+		return [];
+	}
+
+	const theGlob = `${repo}/{notes,references,attachments}/[0-9][0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9]-*`;
+
+	let files = glob.sync(theGlob);
+	let list: QuickPickItem[] = [];
+
+	let regex = /.*\/(notes|references|attachments)\/([0-9]{5}[0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9])-(.*)/;
+
+	for (const file of files) {
+		let matches = file.match(regex);
+		if (matches?.length !== 4){
+			console.error(`Got ${matches?.length} matches, expected 4.`);
+			return [];
+		}
+
+		// let type = matches[1];
+		let id = matches[2];
+		let title = matches[3];
+
+		list.push({
+			label: title,
+			//description: "...",
+			detail: id,
+		});
+	}
+
+	return list;
 }
