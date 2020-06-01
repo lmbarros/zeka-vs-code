@@ -271,25 +271,44 @@ export function getListForLinkCreation(): QuickPickItem[] {
 	let files = glob.sync(theGlob);
 	let list: QuickPickItem[] = [];
 
-	let regex = /.*\/(notes|references|attachments)\/([0-9]{5}[0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9])-(.*)/;
-
 	for (const file of files) {
-		let matches = file.match(regex);
-		if (matches?.length !== 4){
-			console.error(`Got ${matches?.length} matches, expected 4.`);
-			return [];
+		let linkOption = linkOptionFromFileName(file);
+		if (linkOption === undefined) {
+			continue;
 		}
-
-		// let type = matches[1];
-		let id = matches[2];
-		let title = matches[3];
-
-		list.push({
-			label: title,
-			//description: "...",
-			detail: id,
-		});
+		list.push(linkOption);
 	}
 
 	return list;
+}
+
+
+// Given a file name, return a QuickPickItem representing it (for use in a
+// "create link" operation).
+function linkOptionFromFileName(fileName: string): QuickPickItem|undefined {
+	let fileRegex = /.*\/(notes|references|attachments)\/([0-9]{5}[0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9])-(.*)/;
+
+	let matches = fileName.match(fileRegex);
+	if (matches?.length !== 4){
+		console.error(`Found file with unexpected name: ${fileName}`);
+		return undefined;
+	}
+
+	let type = matches[1];
+	let id = matches[2];
+	let title = matches[3];
+
+	if (type === "notes") {
+		const allText = fs.readFileSync(fileName, {encoding: "utf8"});
+		const lines = allText.split("\n", 1);
+		if (lines.length >= 1) {
+			title = lines[0].substr(2);
+		}
+	}
+
+	return {
+		label: title,
+		//description: "...",
+		detail: id,
+	};
 }
