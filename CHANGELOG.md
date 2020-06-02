@@ -2,7 +2,7 @@
 
 All notable changes to the "zeka-vs-code" extension are documented in this file.
 
-## Unreleased
+## 0.0.3
 
 - Create Link
 
