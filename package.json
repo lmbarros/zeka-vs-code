@@ -20,6 +20,7 @@
 		"onCommand:lmb.zeka-vs-code.createNote",
 		"onCommand:lmb.zeka-vs-code.createReference",
 		"onCommand:lmb.zeka-vs-code.createSketch",
+		"onCommand:lmb.zeka-vs-code.createLink",
 		"onCommand:lmb.zeka-vs-code.followLinkUnderCursor"
 	],
 	"main": "./out/extension.js",
@@ -36,6 +37,10 @@
 			{
 				"command": "lmb.zeka-vs-code.createSketch",
 				"title": "Zeka: Create Sketch"
+			},
+			{
+				"command": "lmb.zeka-vs-code.createLink",
+				"title": "Zeka: Create Link"
 			},
 			{
 				"command": "lmb.zeka-vs-code.followLinkUnderCursor",
@@ -67,6 +72,11 @@
 				"key": "ctrl+alt+z s"
 			},
 			{
+				"command": "lmb.zeka-vs-code.createLink",
+				"key": "ctrl+alt+z l",
+				"when": "editorTextFocus && resourceLangId == markdown && resourceFilename =~ /[0-9]{15}-.+\\.md$/"
+			},
+			{
 				"command": "lmb.zeka-vs-code.followLinkUnderCursor",
 				"key": "ctrl+enter",
 				"when": "editorTextFocus && resourceLangId == markdown && resourceFilename =~ /[0-9]{15}-.+\\.md$/"
@@ -95,6 +105,7 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
-		"glob": "^7.1.6"
+		"glob": "^7.1.6",
+		"@sgarciac/bombadil": "^2.3.0"
 	}
 }

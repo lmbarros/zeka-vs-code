@@ -9,6 +9,8 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as glob from "glob";
+import * as bombadil from "@sgarciac/bombadil";
+import { QuickPickItem } from "vscode";
 
 
 // A regex matching (and capturing) the timestamp IDs I use for the Zeka
@@ -183,4 +185,111 @@ export function followLink(link: string) {
 		let doc = await vscode.workspace.openTextDocument(setting);
 		vscode.window.showTextDocument(doc);
 	});
+}
+
+
+// Opens a file matching `theGlob`. Expects that one, and only one, match will
+// exist.
+export function getListForLinkCreation(): QuickPickItem[] {
+	let repo = vscode.workspace.getConfiguration().get<string>("zeka-vs-code.repository");
+	if (repo === undefined || repo === "") {
+		console.error("Something fishy in getListForLinkCreation: no Zeka repository configured!");
+		return [];
+	}
+
+	const theGlob = `${repo}/{notes,references,attachments}/[0-9][0-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9]-*`;
+
+	let files = glob.sync(theGlob);
+	let list: QuickPickItem[] = [];
+
+	for (const file of files) {
+		let linkOption = linkOptionFromFileName(file);
+		if (linkOption === undefined) {
+			continue;
+		}
+		list.push(linkOption);
+	}
+
+	return list;
+}
+
+
+// Given a file name, return a QuickPickItem representing it (for use in a
+// "create link" operation).
+function linkOptionFromFileName(fileName: string): QuickPickItem|undefined {
+	let fileRegex = /.*\/(notes|references|attachments)\/([0-9]{5}[0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9])-(.*)/;
+
+	let matches = fileName.match(fileRegex);
+	if (matches?.length !== 4){
+		console.error(`Found file with unexpected name: ${fileName}`);
+		return undefined;
+	}
+
+	let type = matches[1];
+	let id = matches[2];
+	let title = matches[3];
+	let description = "";
+
+	let allText = "";
+
+	switch (type) {
+		case "notes":
+			allText = fs.readFileSync(fileName, {encoding: "utf8"});
+			const lines = allText.split("\n", 1);
+			if (lines.length >= 1) {
+				title = lines[0].substr(2);
+			}
+			break;
+
+		case "references":
+			allText = fs.readFileSync(fileName, {encoding: "utf8"});
+			let tomlReader = new bombadil.TomlReader();
+			tomlReader.readToml(allText);
+			let data = tomlReader.result;
+
+			// Title
+			if (data.title !== undefined) {
+				let theTitle = data.title;
+				if (typeof theTitle === "string") {
+					title = theTitle;
+				} else if (Array.isArray(theTitle)) {
+					title = theTitle.join("; ");
+				}
+			}
+
+			// Subtitle
+			if (data.subtitle !== undefined) {
+				let theSubtitle = data.subtitle;
+				if (typeof theSubtitle === "string") {
+					title += ": " + theSubtitle;
+				} else {
+					console.log(`Bad subtitle type (${typeof theSubtitle}) for file ${fileName}.`);
+				}
+			}
+
+			// Edition
+			if (data.edition !== undefined) {
+				let theEdition = data.edition;
+				if (typeof theEdition === "string" || typeof theEdition === "number") {
+					title += ", " + theEdition + "Ed.";
+				} else {
+					console.log(`Bad edition type (${typeof theEdition}) for file ${fileName}.`);
+				}
+			}
+
+			// Author
+				let theAuthor = data.author;
+				if (typeof theAuthor === "string") {
+					description = theAuthor;
+				} else if (Array.isArray(theAuthor)) {
+					description = theAuthor.join("; ");
+				}
+			break;
+	}
+
+	return {
+		label: title,
+		description: description,
+		detail: id,
+	};
 }

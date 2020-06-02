@@ -36,6 +36,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 
+	// Create Link
+	disposable = vscode.commands.registerCommand('lmb.zeka-vs-code.createLink', () => {
+		util.checkRepoThen(() => { commands.createLink(); });
+	});
+
+	context.subscriptions.push(disposable);
+
 	// Follow link under cursor
 	disposable = vscode.commands.registerCommand('lmb.zeka-vs-code.followLinkUnderCursor', () => {
 		util.checkRepoThen(() => { commands.followLinkUnderCursor(); });
