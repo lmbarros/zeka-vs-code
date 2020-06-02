@@ -9,6 +9,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as glob from "glob";
+import * as bombadil from "@sgarciac/bombadil";
 import { QuickPickItem } from "vscode";
 
 
@@ -297,18 +298,68 @@ function linkOptionFromFileName(fileName: string): QuickPickItem|undefined {
 	let type = matches[1];
 	let id = matches[2];
 	let title = matches[3];
+	let description = "";
 
-	if (type === "notes") {
-		const allText = fs.readFileSync(fileName, {encoding: "utf8"});
-		const lines = allText.split("\n", 1);
-		if (lines.length >= 1) {
-			title = lines[0].substr(2);
-		}
+	let allText = "";
+
+	switch (type) {
+		case "notes":
+			allText = fs.readFileSync(fileName, {encoding: "utf8"});
+			const lines = allText.split("\n", 1);
+			if (lines.length >= 1) {
+				title = lines[0].substr(2);
+			}
+			break;
+
+		case "references":
+			allText = fs.readFileSync(fileName, {encoding: "utf8"});
+			let tomlReader = new bombadil.TomlReader();
+			tomlReader.readToml(allText);
+			let data = tomlReader.result;
+
+			// Title
+			if (data.title !== undefined) {
+				let theTitle = data.title;
+				if (typeof theTitle === "string") {
+					title = theTitle;
+				} else if (Array.isArray(theTitle)) {
+					title = theTitle.join("; ");
+				}
+			}
+
+			// Subtitle
+			if (data.subtitle !== undefined) {
+				let theSubtitle = data.subtitle;
+				if (typeof theSubtitle === "string") {
+					title += ": " + theSubtitle;
+				} else {
+					console.log(`Bad subtitle type (${typeof theSubtitle}) for file ${fileName}.`);
+				}
+			}
+
+			// Edition
+			if (data.edition !== undefined) {
+				let theEdition = data.edition;
+				if (typeof theEdition === "string" || typeof theEdition === "number") {
+					title += ", " + theEdition + "Ed.";
+				} else {
+					console.log(`Bad edition type (${typeof theEdition}) for file ${fileName}.`);
+				}
+			}
+
+			// Author
+				let theAuthor = data.author;
+				if (typeof theAuthor === "string") {
+					description = theAuthor;
+				} else if (Array.isArray(theAuthor)) {
+					description = theAuthor.join("; ");
+				}
+			break;
 	}
 
 	return {
 		label: title,
-		//description: "...",
+		description: description,
 		detail: id,
 	};
 }

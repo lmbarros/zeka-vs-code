@@ -16,3 +16,6 @@
 * Auto-complete #tags.
 * Auto-complete @projects.
 * Promote sketch to note.
+
+* Generation of book titles is subpar (handing of the edition is particularly
+  half-backed).
