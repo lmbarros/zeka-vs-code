@@ -1,12 +1,10 @@
 # Zeka TODO
 
+* *Add Attachment* command (for images, basically).
 * Show link information (title, reference info) in the status bar or something
   like that.
 * Render links to notes.
 * Render links to references.
-* *Link Note* command (including some decent searching).
-* *Link Reference* command (including some decent searching).
-* *Add Attachment* comment (for images, basically).
 * Render links to attachments.
 * *Link Attachment* command (including some decent searching, maybe browse
   looking at the images themselves).
@@ -14,8 +12,10 @@
   and pre-fill the template accordingly.
 * Rename file when title is changed.
 * Auto-complete #tags.
-* Auto-complete @projects.
+* Auto-complete @topics.
 * Promote sketch to note.
 
 * Generation of book titles is subpar (handing of the edition is particularly
   half-backed).
+* Improve performance of "Create Link" (currently reads all notes and references
+  every time the command is invoked -- will not scale to larger repositories).
