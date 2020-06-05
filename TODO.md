@@ -1,5 +1,6 @@
 # Zeka TODO
 
+* In a new note: add dummy @tag and "- - - - -"
 * *Add Attachment* command (for images, basically).
 * Show link information (title, reference info) in the status bar or something
   like that.
@@ -11,7 +12,7 @@
 * When adding reference, split a title like "Foo: Bar" into title and subtitle,
   and pre-fill the template accordingly.
 * Rename file when title is changed.
-* Auto-complete #tags.
+* Auto-complete #tags (well, not using #tags at the moment, only @tags).
 * Auto-complete @topics.
 * Promote sketch to note.
 
