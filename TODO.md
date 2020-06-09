@@ -1,5 +1,6 @@
 # Zeka TODO
 
+* If I am over the link text and hit Ctrl+Enter, navigation should work.
 * In a new note: add dummy @tag and "- - - - -"
 * *Add Attachment* command (for images, basically).
 * Show link information (title, reference info) in the status bar or something
